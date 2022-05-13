@@ -8,6 +8,10 @@ namespace TeamZero.InAppPurchases
 {
     public class NonConsumablePurchase : Purchase, IRestorable
     {
+        internal NonConsumablePurchase(string id) : base(id)
+        {
+        }
+        
         public event Action? Restored;
         
 #if PACKAGE_COM_NEUECC_UNIRX
