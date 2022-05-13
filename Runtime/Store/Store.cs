@@ -15,7 +15,7 @@ namespace TeamZero.InAppPurchases
 
         public static Store Create(Log log)
         {
-            UnityIAPHub hub = UnityIAPHub.Create(log);
+            var hub = UnityIAP.UnityIAPHub.Create(log);
             return new Store(hub, hub, log);
         }
 

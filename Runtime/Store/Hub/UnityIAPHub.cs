@@ -4,12 +4,13 @@ using Cysharp.Threading.Tasks;
 using TeamZero.Core.Logging;
 using UnityEngine.Purchasing;
 
-namespace TeamZero.InAppPurchases
+namespace TeamZero.InAppPurchases.UnityIAP
 {
     public class UnityIAPHub : IStoreHub, IPurchaseHub, IStoreListener
     {
         private readonly Log _log;
         private IStoreController _store;
+        private IPurchaseValidator _validator;
         
         public static UnityIAPHub Create(Log log) => new (log);
 
@@ -65,6 +66,7 @@ namespace TeamZero.InAppPurchases
         {
             _log.Info("In-App Purchasing successfully initialized");
             _store = controller;
+            _validator = ValidatorFactory.CreateDefault(_log);
         }
         
         void IStoreListener.OnInitializeFailed(InitializationFailureReason error)
@@ -74,6 +76,10 @@ namespace TeamZero.InAppPurchases
 
         public async UniTask<bool> RestoreAllAsync()
         {
+            if (AssertInitialized())
+            {
+            }
+            
             throw new System.NotImplementedException();
         }
 
@@ -101,8 +107,11 @@ namespace TeamZero.InAppPurchases
 
         PurchaseProcessingResult IStoreListener.ProcessPurchase(PurchaseEventArgs args)
         {
-            string id = args.purchasedProduct.definition.id;
-            SendPurchaseResult(id, true);
+            var product = args.purchasedProduct;
+            string id = product.definition.id;
+
+            bool isPurchaseValid = _validator.IsPurchaseValid(product.receipt);
+            SendPurchaseResult(id, isPurchaseValid);
             
             return PurchaseProcessingResult.Complete;
         }
