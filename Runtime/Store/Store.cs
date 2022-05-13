@@ -1,5 +1,6 @@
 #nullable enable
 using Cysharp.Threading.Tasks;
+using TeamZero.Core.Logging;
 
 namespace TeamZero.InAppPurchases
 {
@@ -10,26 +11,28 @@ namespace TeamZero.InAppPurchases
         private readonly Library<ISubscription> _subscriptionLibrary;
 
         private readonly IStoreHub _hub;
+        private readonly Log _log;
 
-        public static Store Create()
+        public static Store Create(Log log)
         {
             UnityIAPHub hub = UnityIAPHub.Create();
-            return new Store(hub, hub);
+            return new Store(hub, hub, log);
         }
 
-        private Store(IStoreHub storeHub, IPurchaseHub purchaseHub)
+        private Store(IStoreHub storeHub, IPurchaseHub purchaseHub, Log log)
         {
             _consumableLibrary = Library<ConsumablePurchase>.Create(this, purchaseHub);
             _nonConsumableLibrary = Library<NonConsumablePurchase>.Create(this, purchaseHub);
             _subscriptionLibrary = Library<ISubscription>.Create(this, purchaseHub);
             _hub = storeHub;
+            _log = log;
         }
         
-        ConsumablePurchase IPurchaseFactory<ConsumablePurchase>.Create(string id, IPurchaseHub hub) => new (id, hub);
+        ConsumablePurchase IPurchaseFactory<ConsumablePurchase>.Create(string id, IPurchaseHub hub) => new (id, hub, _log);
         public ConsumablePurchase RegisterNewConsumable(string id) => _consumableLibrary.Register(id);
 
 
-        NonConsumablePurchase IPurchaseFactory<NonConsumablePurchase>.Create(string id, IPurchaseHub hub) => new (id, hub);
+        NonConsumablePurchase IPurchaseFactory<NonConsumablePurchase>.Create(string id, IPurchaseHub hub) => new (id, hub, _log);
         public NonConsumablePurchase RegisterNewNonConsumable(string id) => _nonConsumableLibrary.Register(id);
 
         ISubscription IPurchaseFactory<ISubscription>.Create(string id, IPurchaseHub hub) => throw new System.NotImplementedException();

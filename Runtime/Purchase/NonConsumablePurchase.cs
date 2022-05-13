@@ -3,12 +3,13 @@
 using UniRx;
 #endif
 using System;
+using TeamZero.Core.Logging;
 
 namespace TeamZero.InAppPurchases
 {
     public class NonConsumablePurchase : Purchase, IRestorable
     {
-        internal NonConsumablePurchase(string id, IPurchaseHub hub) : base(id, hub)
+        internal NonConsumablePurchase(string id, IPurchaseHub hub, Log log) : base(id, hub, log)
         {
         }
         
