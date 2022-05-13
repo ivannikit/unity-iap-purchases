@@ -4,7 +4,7 @@ namespace TeamZero.InAppPurchases
 {
     public class ConsumablePurchase : Purchase
     {
-        internal ConsumablePurchase(string id) : base(id)
+        internal ConsumablePurchase(string id, IPurchaseHub hub) : base(id, hub)
         {
         }
     }

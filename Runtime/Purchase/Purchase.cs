@@ -6,15 +6,14 @@ namespace TeamZero.InAppPurchases
     public abstract class Purchase : IPurchase
     {
         private readonly string _id;
+        private readonly IPurchaseHub _hub;
 
-        internal Purchase(string id)
+        internal Purchase(string id, IPurchaseHub hub)
         {
             _id = id;
+            _hub = hub;
         }
 
-        public UniTask<bool> ConsumeAsync()
-        {
-            throw new System.NotImplementedException();
-        }
+        public async UniTask<bool> ConsumeAsync() => await _hub.PurchaseAsync(_id);
     }
 }

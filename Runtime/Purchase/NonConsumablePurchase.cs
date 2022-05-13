@@ -8,7 +8,7 @@ namespace TeamZero.InAppPurchases
 {
     public class NonConsumablePurchase : Purchase, IRestorable
     {
-        internal NonConsumablePurchase(string id) : base(id)
+        internal NonConsumablePurchase(string id, IPurchaseHub hub) : base(id, hub)
         {
         }
         
