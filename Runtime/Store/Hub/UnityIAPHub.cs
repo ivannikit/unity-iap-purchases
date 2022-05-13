@@ -1,47 +1,135 @@
+#nullable enable
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using TeamZero.Core.Logging;
 using UnityEngine.Purchasing;
 
 namespace TeamZero.InAppPurchases
 {
-    public class UnityIAPHub : MonoBehaviour, IStoreHub, IPurchaseHub, IStoreListener
+    public class UnityIAPHub : IStoreHub, IPurchaseHub, IStoreListener
     {
-        public static UnityIAPHub Create() => new ();
+        private readonly Log _log;
+        private IStoreController _store;
         
-        public void Init(IEnumerable<string> consumableIds, IEnumerable<string> nonConsumableIds, IEnumerable<string> subscriptionIds)
+        public static UnityIAPHub Create(Log log) => new (log);
+
+        private UnityIAPHub(Log log)
         {
-            throw new System.NotImplementedException();
+            _log = log;
+        }
+        
+
+        public void Init(IEnumerable<string>? consumableIds, IEnumerable<string>? nonConsumableIds, IEnumerable<string>? subscriptionIds)
+        {
+            var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
+
+            foreach (string id in FilterMissing(consumableIds))
+                builder.AddProduct(id, ProductType.NonConsumable);
+
+            foreach (string id in FilterMissing(nonConsumableIds))
+                builder.AddProduct(id, ProductType.NonConsumable);
+            
+            foreach (string id in FilterMissing(subscriptionIds))
+                builder.AddProduct(id, ProductType.Subscription);
+
+            UnityPurchasing.Initialize(this, builder);
         }
 
-        public UniTask<bool> RestoreAllAsync()
+        private IEnumerable<string> FilterMissing(IEnumerable<string>? ids)
         {
-            throw new System.NotImplementedException();
+            if(ids != null)
+                foreach (string id in ids)
+                {
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        _log.Error("id is null or empty");
+                        continue;
+                    }
+
+                    yield return id;
+                }
         }
 
-        public UniTask<bool> PurchaseAsync(string id)
+        private bool AssertInitialized()
         {
-            throw new System.NotImplementedException();
-        }
+            if (_store == null)
+            {
+                _log.Error($"In-App Purchasing isn't initialized");
+                return false;
+            }
 
+            return true;
+        }
+        
+        void IStoreListener.OnInitialized(IStoreController controller, IExtensionProvider extensions)
+        {
+            _log.Info("In-App Purchasing successfully initialized");
+            _store = controller;
+        }
+        
         void IStoreListener.OnInitializeFailed(InitializationFailureReason error)
         {
+            _log.Error($"In-App Purchasing initialize failed: {error}");
+        }
+
+        public async UniTask<bool> RestoreAllAsync()
+        {
             throw new System.NotImplementedException();
         }
 
-        PurchaseProcessingResult IStoreListener.ProcessPurchase(PurchaseEventArgs purchaseEvent)
+        private readonly Dictionary<string, UniTaskCompletionSource<bool>> _purchaseTaskCollection = new ();
+        public async UniTask<bool> PurchaseAsync(string id)
         {
-            throw new System.NotImplementedException();
+            if (AssertInitialized())
+            {
+                if (_purchaseTaskCollection.ContainsKey(id))
+                {
+                    _log.Error($"Purchase already in process - Product: {id}");
+                    return false;
+                }
+                
+                _log.Info($"Starting purchase - Product: {id}");
+                var source = new UniTaskCompletionSource<bool>();
+                _purchaseTaskCollection.Add(id, source);
+                _store.InitiatePurchase(id);
+
+                return await source.Task;
+            }
+
+            return false;
+        }
+
+        PurchaseProcessingResult IStoreListener.ProcessPurchase(PurchaseEventArgs args)
+        {
+            string id = args.purchasedProduct.definition.id;
+            SendPurchaseResult(id, true);
+            
+            return PurchaseProcessingResult.Complete;
         }
 
         void IStoreListener.OnPurchaseFailed(Product product, PurchaseFailureReason failureReason)
         {
-            throw new System.NotImplementedException();
+            string id = product.definition.id;
+            SendPurchaseResult(id, false);
         }
 
-        void IStoreListener.OnInitialized(IStoreController controller, IExtensionProvider extensions)
+        private void SendPurchaseResult(string id, bool completed)
         {
-            throw new System.NotImplementedException();
+            if (_purchaseTaskCollection.TryGetValue(id, out UniTaskCompletionSource<bool> source))
+            {
+                if (_log.InfoEnabled())
+                {
+                    string result = completed ? "Completed" : "Failed";
+                    _log.Info($"Purchase result: {result} Product: {id}");
+                }
+                
+                _purchaseTaskCollection.Remove(id);
+                source.TrySetResult(completed);
+            }
+            else
+            {
+                _log.Error($"Process purchase not found - Product: {id}");
+            }
         }
     }
 }
