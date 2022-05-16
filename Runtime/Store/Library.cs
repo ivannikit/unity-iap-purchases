@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 #nullable enable
 
@@ -12,7 +13,7 @@ namespace TeamZero.InAppPurchases
     
     internal class Library<T> where T : IPurchase
     {
-        private readonly Dictionary<string, T> _items;
+        protected readonly Dictionary<string, T> _items;
         private readonly IPurchaseFactory<T> _factory;
         private readonly IPurchaseHub _hub;
 
@@ -22,7 +23,7 @@ namespace TeamZero.InAppPurchases
             return new Library<T>(factory, hub, items);
         }
 
-        private Library(IPurchaseFactory<T> factory, IPurchaseHub hub, Dictionary<string, T> items)
+        protected Library(IPurchaseFactory<T> factory, IPurchaseHub hub, Dictionary<string, T> items)
         {
             _factory = factory;
             _items = items;
@@ -38,6 +39,26 @@ namespace TeamZero.InAppPurchases
             _items.Add(id, instance);
             
             return instance;
+        }
+    }
+
+    internal class RestoredLibrary<T> : Library<T> where T : IPurchase, IRestorable
+    {
+        internal new static RestoredLibrary<T> Create(IPurchaseFactory<T> factory, IPurchaseHub hub, int capacity = 0)
+        {
+            Dictionary<string, T> items = new (capacity);
+            return new RestoredLibrary<T>(factory, hub, items);
+        }
+        
+        protected RestoredLibrary(IPurchaseFactory<T> factory, IPurchaseHub hub, Dictionary<string, T> items) 
+            : base(factory, hub, items)
+        {
+        }
+        
+        public void RestorePurchasesComplete()
+        {
+            foreach (T purchase in _items.Values)
+                purchase.RestoreComplete();
         }
     }
 }

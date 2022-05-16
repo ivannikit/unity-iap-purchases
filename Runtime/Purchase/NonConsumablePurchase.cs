@@ -19,5 +19,12 @@ namespace TeamZero.InAppPurchases
         private readonly Subject<Unit> _restoredSubject = new();
         public IObservable<Unit> RestoredAsObservable() => _restoredSubject;
 #endif
+        
+        public void RestoreComplete()
+        {
+            //TODO set dirty
+            Restored?.Invoke();
+            _restoredSubject.OnNext(Unit.Default);
+        }
     }
 }

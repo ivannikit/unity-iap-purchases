@@ -10,5 +10,6 @@ namespace TeamZero.InAppPurchases
 #if PACKAGE_COM_NEUECC_UNIRX
         IObservable<UniRx.Unit> RestoredAsObservable();
 #endif
+        void RestoreComplete();
     }
 }

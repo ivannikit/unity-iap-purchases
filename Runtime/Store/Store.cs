@@ -7,8 +7,8 @@ namespace TeamZero.InAppPurchases
     public class Store : IPurchaseFactory<ConsumablePurchase>, IPurchaseFactory<NonConsumablePurchase>, IPurchaseFactory<ISubscription>
     {
         private readonly Library<ConsumablePurchase> _consumableLibrary;
-        private readonly Library<NonConsumablePurchase> _nonConsumableLibrary;
-        private readonly Library<ISubscription> _subscriptionLibrary;
+        private readonly RestoredLibrary<NonConsumablePurchase> _nonConsumableLibrary;
+        private readonly RestoredLibrary<ISubscription> _subscriptionLibrary;
 
         private readonly IStoreHub _hub;
         private readonly Log _log;
@@ -22,8 +22,8 @@ namespace TeamZero.InAppPurchases
         private Store(IStoreHub storeHub, IPurchaseHub purchaseHub, Log log)
         {
             _consumableLibrary = Library<ConsumablePurchase>.Create(this, purchaseHub);
-            _nonConsumableLibrary = Library<NonConsumablePurchase>.Create(this, purchaseHub);
-            _subscriptionLibrary = Library<ISubscription>.Create(this, purchaseHub);
+            _nonConsumableLibrary = RestoredLibrary<NonConsumablePurchase>.Create(this, purchaseHub);
+            _subscriptionLibrary = RestoredLibrary<ISubscription>.Create(this, purchaseHub);
             _hub = storeHub;
             _log = log;
         }
@@ -43,7 +43,8 @@ namespace TeamZero.InAppPurchases
             bool succeeded = await _hub.RestoreAllAsync();
             if (succeeded)
             {
-                //TODO restore product events
+                _nonConsumableLibrary.RestorePurchasesComplete();
+                _subscriptionLibrary.RestorePurchasesComplete();
             }
         }
     }

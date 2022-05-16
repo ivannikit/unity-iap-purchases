@@ -9,8 +9,9 @@ namespace TeamZero.InAppPurchases.UnityIAP
     public class UnityIAPHub : IStoreHub, IPurchaseHub, IStoreListener
     {
         private readonly Log _log;
-        private IStoreController _store;
-        private IPurchaseValidator _validator;
+        private IStoreController? _store;
+        private IPurchaseValidator? _validator;
+        private IStoreExtension? _extension;
         
         public static UnityIAPHub Create(Log log) => new (log);
 
@@ -67,6 +68,7 @@ namespace TeamZero.InAppPurchases.UnityIAP
             _log.Info("In-App Purchasing successfully initialized");
             _store = controller;
             _validator = ValidatorFactory.CreateDefault(_log);
+            _extension = ExtensionFactory.CreateDefault(extensions, _log);
         }
         
         void IStoreListener.OnInitializeFailed(InitializationFailureReason error)
@@ -76,17 +78,16 @@ namespace TeamZero.InAppPurchases.UnityIAP
 
         public async UniTask<bool> RestoreAllAsync()
         {
-            if (AssertInitialized())
-            {
-            }
-            
-            throw new System.NotImplementedException();
+            if (AssertInitialized() && _extension != null)
+                return await _extension.RestoreTransactions();
+
+            return false;
         }
 
         private readonly Dictionary<string, UniTaskCompletionSource<bool>> _purchaseTaskCollection = new ();
         public async UniTask<bool> PurchaseAsync(string id)
         {
-            if (AssertInitialized())
+            if (AssertInitialized() && _store != null)
             {
                 if (_purchaseTaskCollection.ContainsKey(id))
                 {
@@ -110,9 +111,9 @@ namespace TeamZero.InAppPurchases.UnityIAP
             var product = args.purchasedProduct;
             string id = product.definition.id;
 
-            bool isPurchaseValid = _validator.IsPurchaseValid(product.receipt);
+            bool isPurchaseValid = _validator?.IsPurchaseValid(product.receipt) ?? false;
             SendPurchaseResult(id, isPurchaseValid);
-            
+
             return PurchaseProcessingResult.Complete;
         }
 
