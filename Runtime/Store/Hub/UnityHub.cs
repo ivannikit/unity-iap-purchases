@@ -6,16 +6,16 @@ using UnityEngine.Purchasing;
 
 namespace TeamZero.InAppPurchases.UnityIAP
 {
-    public class UnityIAPHub : IStoreHub, IPurchaseHub, IStoreListener
+    public class UnityHub : IStoreHub, IPurchaseHub, IStoreListener
     {
         private readonly Log _log;
         private IStoreController? _store;
         private IPurchaseValidator? _validator;
         private IStoreExtension? _extension;
         
-        public static UnityIAPHub Create(Log log) => new (log);
+        public static UnityHub Create(Log log) => new (log);
 
-        private UnityIAPHub(Log log)
+        private UnityHub(Log log)
         {
             _log = log;
         }
@@ -44,7 +44,7 @@ namespace TeamZero.InAppPurchases.UnityIAP
                 {
                     if (string.IsNullOrEmpty(id))
                     {
-                        _log.Error("id is null or empty");
+                        _log.Error("Id is null or empty");
                         continue;
                     }
 
