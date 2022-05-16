@@ -22,7 +22,7 @@ namespace TeamZero.InAppPurchases
         
         public void RestoreComplete()
         {
-            //TODO set dirty
+            ChangeStatus();
             Restored?.Invoke();
             _restoredSubject.OnNext(Unit.Default);
         }

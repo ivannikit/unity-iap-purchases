@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Cysharp.Threading.Tasks;
 using TeamZero.Core.Logging;
 
@@ -18,5 +19,38 @@ namespace TeamZero.InAppPurchases
         }
 
         public async UniTask<bool> ConsumeAsync() => await _hub.PurchaseAsync(_id);
+        public event Action? StatusChanged;
+
+
+        private PurchaseMetadata? _meta;
+        private PurchaseMetadata? Meta
+        {
+            get
+            {
+                if (!_meta.HasValue && _hub.Initialized())
+                    _meta = _hub.PurchaseMetadata(_id);
+
+                return _meta;
+            }
+        }
+
+#if PACKAGE_COM_NEUECC_UNIRX
+        private readonly UniRx.Subject<UniRx.Unit> _statusSubject = new ();
+        public IObservable<UniRx.Unit> StatusAsObservable() => _statusSubject;
+#endif
+
+        public void ChangeStatus()
+        {
+            StatusChanged?.Invoke();
+#if PACKAGE_COM_NEUECC_UNIRX
+            _statusSubject.OnNext(UniRx.Unit.Default);
+#endif
+        }
+
+        public string LocalizedPriceText() => Meta?.LocalizedPriceText ?? String.Empty;
+
+        public bool IsConsumed() => _hub.IsConsumed(_id);
+        
+        public bool IsAvailableToPurchase() => _hub.IsAvailableToPurchase(_id);
     }
 }

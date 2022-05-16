@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using UnityEngine.Purchasing;
 
 #nullable enable
 
@@ -40,6 +41,14 @@ namespace TeamZero.InAppPurchases
             
             return instance;
         }
+        
+        public void ChangeStatus()
+        {
+            foreach (T purchase in _items.Values)
+                purchase.ChangeStatus();
+        }
+
+        public ICollection<string> Ids() => _items.Keys;
     }
 
     internal class RestoredLibrary<T> : Library<T> where T : IPurchase, IRestorable

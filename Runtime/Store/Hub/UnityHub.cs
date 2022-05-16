@@ -19,9 +19,9 @@ namespace TeamZero.InAppPurchases.UnityIAP
         {
             _log = log;
         }
-        
 
-        public void Init(IEnumerable<string>? consumableIds, IEnumerable<string>? nonConsumableIds, IEnumerable<string>? subscriptionIds)
+        private UniTaskCompletionSource? _initSource;
+        public async UniTask InitAsync(IEnumerable<string>? consumableIds, IEnumerable<string>? nonConsumableIds, IEnumerable<string>? subscriptionIds)
         {
             var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
 
@@ -34,7 +34,9 @@ namespace TeamZero.InAppPurchases.UnityIAP
             foreach (string id in FilterMissing(subscriptionIds))
                 builder.AddProduct(id, ProductType.Subscription);
 
+            _initSource = new UniTaskCompletionSource();
             UnityPurchasing.Initialize(this, builder);
+            await _initSource.Task;
         }
 
         private IEnumerable<string> FilterMissing(IEnumerable<string>? ids)
@@ -69,13 +71,20 @@ namespace TeamZero.InAppPurchases.UnityIAP
             _store = controller;
             _validator = ValidatorFactory.CreateDefault(_log);
             _extension = ExtensionFactory.CreateDefault(extensions, _log);
+            
+            _initSource?.TrySetResult();
+            _initSource = null;
         }
         
         void IStoreListener.OnInitializeFailed(InitializationFailureReason error)
         {
             _log.Error($"In-App Purchasing initialize failed: {error}");
+            
+            _initSource?.TrySetResult();
+            _initSource = null;
         }
 
+        
         public async UniTask<bool> RestoreAllAsync()
         {
             if (AssertInitialized() && _extension != null)
@@ -84,6 +93,7 @@ namespace TeamZero.InAppPurchases.UnityIAP
             return false;
         }
 
+        
         private readonly Dictionary<string, UniTaskCompletionSource<bool>> _purchaseTaskCollection = new ();
         public async UniTask<bool> PurchaseAsync(string id)
         {
@@ -141,5 +151,12 @@ namespace TeamZero.InAppPurchases.UnityIAP
                 _log.Error($"Process purchase not found - Product: {id}");
             }
         }
+        
+        
+        bool IPurchaseHub.Initialized() => _store != null;
+        private Product? ProductWithId(string id) => _store?.products.WithID(id);
+        PurchaseMetadata? IPurchaseHub.PurchaseMetadata(string id) => ProductWithId(id)?.ToPurchaseMetadata();
+        bool IPurchaseHub.IsAvailableToPurchase(string id) => ProductWithId(id)?.availableToPurchase ?? false;
+        bool IPurchaseHub.IsConsumed(string id) => ProductWithId(id)?.hasReceipt ?? false;
     }
 }

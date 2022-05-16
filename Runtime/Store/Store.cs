@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using TeamZero.Core.Logging;
 
@@ -37,6 +38,14 @@ namespace TeamZero.InAppPurchases
 
         ISubscription IPurchaseFactory<ISubscription>.Create(string id, IPurchaseHub hub) => throw new System.NotImplementedException();
         public ISubscription RegisterNewSubscription(string id) => throw new System.NotImplementedException();
+
+        public async UniTask InitAsync()
+        {
+            IEnumerable<string> consumableIds = _consumableLibrary.Ids();
+            IEnumerable<string > nonConsumableIds = _nonConsumableLibrary.Ids();
+            IEnumerable<string> subscriptionIds = _subscriptionLibrary.Ids();
+            await _hub.InitAsync(consumableIds, nonConsumableIds, subscriptionIds);
+        }
 
         public async UniTask RestoreAll()
         {

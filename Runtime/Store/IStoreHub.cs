@@ -6,7 +6,7 @@ namespace TeamZero.InAppPurchases
 {
     internal interface IStoreHub
     {
-        void Init(IEnumerable<string>? consumableIds, IEnumerable<string>? nonConsumableIds, 
+        UniTask InitAsync(IEnumerable<string>? consumableIds, IEnumerable<string>? nonConsumableIds, 
             IEnumerable<string>? subscriptionIds);
         
         UniTask<bool> RestoreAllAsync();
