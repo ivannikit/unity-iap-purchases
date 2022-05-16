@@ -45,8 +45,16 @@ namespace TeamZero.InAppPurchases
             IEnumerable<string > nonConsumableIds = _nonConsumableLibrary.Ids();
             IEnumerable<string> subscriptionIds = _subscriptionLibrary.Ids();
             await _hub.InitAsync(consumableIds, nonConsumableIds, subscriptionIds);
+            ChangeStatusForAll();
         }
 
+        private void ChangeStatusForAll()
+        {
+            _consumableLibrary.ChangeStatus();
+            _nonConsumableLibrary.ChangeStatus();
+            _subscriptionLibrary.ChangeStatus();
+        }
+        
         public async UniTask RestoreAll()
         {
             bool succeeded = await _hub.RestoreAllAsync();

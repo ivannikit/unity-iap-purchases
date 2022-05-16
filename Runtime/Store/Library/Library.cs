@@ -1,17 +1,9 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
-using UnityEngine.Purchasing;
-
-#nullable enable
 
 namespace TeamZero.InAppPurchases
 {
-    internal interface IPurchaseFactory<out T> where T : IPurchase
-    {
-        T Create(string id, IPurchaseHub hub);
-    }
-    
     internal class Library<T> where T : IPurchase
     {
         protected readonly Dictionary<string, T> _items;
@@ -49,25 +41,5 @@ namespace TeamZero.InAppPurchases
         }
 
         public ICollection<string> Ids() => _items.Keys;
-    }
-
-    internal class RestoredLibrary<T> : Library<T> where T : IPurchase, IRestorable
-    {
-        internal new static RestoredLibrary<T> Create(IPurchaseFactory<T> factory, IPurchaseHub hub, int capacity = 0)
-        {
-            Dictionary<string, T> items = new (capacity);
-            return new RestoredLibrary<T>(factory, hub, items);
-        }
-        
-        protected RestoredLibrary(IPurchaseFactory<T> factory, IPurchaseHub hub, Dictionary<string, T> items) 
-            : base(factory, hub, items)
-        {
-        }
-        
-        public void RestorePurchasesComplete()
-        {
-            foreach (T purchase in _items.Values)
-                purchase.RestoreComplete();
-        }
     }
 }
