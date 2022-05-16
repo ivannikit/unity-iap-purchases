@@ -79,7 +79,6 @@ namespace TeamZero.InAppPurchases.UnityIAP
         void IStoreListener.OnInitializeFailed(InitializationFailureReason error)
         {
             _log.Error($"In-App Purchasing initialize failed: {error}");
-            
             _initSource?.TrySetResult();
             _initSource = null;
         }
@@ -101,7 +100,7 @@ namespace TeamZero.InAppPurchases.UnityIAP
             {
                 if (_purchaseTaskCollection.ContainsKey(id))
                 {
-                    _log.Error($"Purchase already in process - Product: {id}");
+                    _log.Warning($"Purchase already in process (skip call) - Product: {id}");
                     return false;
                 }
                 
@@ -148,7 +147,7 @@ namespace TeamZero.InAppPurchases.UnityIAP
             }
             else
             {
-                _log.Error($"Process purchase not found - Product: {id}");
+                _log.Error($"Purchase result not found - Product: {id}");
             }
         }
         
