@@ -14,8 +14,8 @@ namespace TeamZero.InAppPurchases
 #if PACKAGE_COM_NEUECC_UNIRX
         IObservable<UniRx.Unit> StatusAsObservable();
 #endif
-        void ChangeStatus();
-
+        
+        void ChangeStatus(); //TODO This method must be not available from API (internal)
         
         string LocalizedPriceText();
         bool IsAvailableToPurchase();
