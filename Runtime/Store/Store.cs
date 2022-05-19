@@ -30,10 +30,10 @@ namespace TeamZero.InAppPurchases
         }
         
         ConsumablePurchase IPurchaseFactory<ConsumablePurchase>.Create(string id, IPurchaseHub hub) => new (id, hub, _log);
-        public ConsumablePurchase RegisterNewConsumable(string id) => _consumableLibrary.Register(id);
+        public IPurchase RegisterNewConsumable(string id) => _consumableLibrary.Register(id);
         
         NonConsumablePurchase IPurchaseFactory<NonConsumablePurchase>.Create(string id, IPurchaseHub hub) => new (id, hub, _log);
-        public NonConsumablePurchase RegisterNewNonConsumable(string id) => _nonConsumableLibrary.Register(id);
+        public IRestorablePurchase RegisterNewNonConsumable(string id) => _nonConsumableLibrary.Register(id);
 
         ISubscription IPurchaseFactory<ISubscription>.Create(string id, IPurchaseHub hub) => throw new System.NotImplementedException();
         public ISubscription RegisterNewSubscription(string id) => throw new System.NotImplementedException();

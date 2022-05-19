@@ -7,7 +7,7 @@ using TeamZero.Core.Logging;
 
 namespace TeamZero.InAppPurchases
 {
-    public class NonConsumablePurchase : Purchase, IRestorable
+    public class NonConsumablePurchase : Purchase, IRestorablePurchase
     {
         internal NonConsumablePurchase(string id, IPurchaseHub hub, Log log) : base(id, hub, log)
         {
@@ -24,7 +24,9 @@ namespace TeamZero.InAppPurchases
         {
             ChangeStatus();
             Restored?.Invoke();
+#if PACKAGE_COM_NEUECC_UNIRX
             _restoredSubject.OnNext(Unit.Default);
+#endif
         }
     }
 }

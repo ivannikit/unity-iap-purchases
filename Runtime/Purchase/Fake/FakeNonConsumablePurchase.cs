@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 
 namespace TeamZero.InAppPurchases
 {
-    internal class FakeNonConsumablePurchase : IPurchase
+    internal class FakeNonConsumablePurchase : IRestorablePurchase
     {
         public static FakeNonConsumablePurchase Create(string price) => new(price);
 
@@ -59,6 +59,23 @@ namespace TeamZero.InAppPurchases
             StatusChanged?.Invoke();
 #if PACKAGE_COM_NEUECC_UNIRX
             _statusSubject.OnNext(UniRx.Unit.Default);
+#endif
+        }
+
+        
+        public event Action? Restored;
+        
+#if PACKAGE_COM_NEUECC_UNIRX
+        private readonly UniRx.Subject<UniRx.Unit> _restoredSubject = new();
+        public IObservable<UniRx.Unit> RestoredAsObservable() => _restoredSubject;
+#endif
+        
+        public void RestoreComplete()
+        {
+            ChangeStatus();
+            Restored?.Invoke();
+#if PACKAGE_COM_NEUECC_UNIRX
+            _restoredSubject.OnNext(UniRx.Unit.Default);
 #endif
         }
     }
