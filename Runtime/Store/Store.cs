@@ -50,7 +50,7 @@ namespace TeamZero.InAppPurchases
             _subscriptionLibrary.ChangeStatus();
         }
         
-        public async UniTask RestoreAll()
+        public async UniTask RestoreAllAsync()
         {
             bool succeeded = await _hub.RestoreAllAsync();
             if (succeeded)
