@@ -7,9 +7,10 @@ namespace TeamZero.InAppPurchases
     internal class FakeNonConsumablePurchase : IRestorablePurchase
     {
         public static FakeNonConsumablePurchase Create(string price) => new(price);
-
+        
         private readonly string _price;
         private bool _initialized = false;
+        private bool _consumed = false;
         
         private FakeNonConsumablePurchase(string price)
         {
@@ -26,16 +27,17 @@ namespace TeamZero.InAppPurchases
         
         public string LocalizedPriceText() => _initialized ? _price : string.Empty;
 
-        public bool IsConsumed() => false;
+        public bool IsConsumed() => _consumed;
         
-        public bool IsAvailableToPurchase() => _initialized;
+        public bool IsAvailableToPurchase() => _initialized && !_consumed;
         
         public async UniTask<bool> ConsumeAsync()
         {
             if (IsAvailableToPurchase())
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(5), DelayType.Realtime);
-
+                
+                _consumed = true;
                 ChangeStatus();
                 return true;
             }
@@ -59,15 +61,15 @@ namespace TeamZero.InAppPurchases
             _statusSubject.OnNext(UniRx.Unit.Default);
 #endif
         }
-
+        
         
         public event Action? Restored;
-        
+
 #if PACKAGE_COM_NEUECC_UNIRX
         private readonly UniRx.Subject<UniRx.Unit> _restoredSubject = new();
         public IObservable<UniRx.Unit> RestoredAsObservable() => _restoredSubject;
 #endif
-        
+
         public void RestoreComplete()
         {
             ChangeStatus();
