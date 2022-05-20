@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using TeamZero.Core.Logging;
+using TeamZero.InAppPurchases.UnityIAP;
 
 namespace TeamZero.InAppPurchases
 {
@@ -16,7 +17,15 @@ namespace TeamZero.InAppPurchases
 
         public static Store Create(Log log)
         {
-            var hub = UnityIAP.UnityHub.Create(log);
+            // ReSharper disable once JoinDeclarationAndInitializer
+            IPlatformHub hub;
+#if UNITY_EDITOR
+            hub = NotSupportedPlatformHub.Create(log);
+#elif UNITY_ANDROID || UNITY_IOS
+            hub = UnityIAP.UnityHub.Create(log);
+#else
+            hub = NotSupportedPlatformHub.Create(log);
+#endif
             return new Store(hub, hub, log);
         }
 

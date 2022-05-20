@@ -6,7 +6,7 @@ using UnityEngine.Purchasing;
 
 namespace TeamZero.InAppPurchases.UnityIAP
 {
-    public class UnityHub : IStoreHub, IPurchaseHub, IStoreListener
+    public class UnityHub : IPlatformHub, IStoreListener
     {
         private readonly Log _log;
         private IStoreController? _store;
