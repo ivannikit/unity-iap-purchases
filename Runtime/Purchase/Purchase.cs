@@ -1,4 +1,9 @@
 #nullable enable
+
+#if PACKAGE_COM_NEUECC_UNIRX
+using UniRx;
+#endif
+
 using System;
 using Cysharp.Threading.Tasks;
 using TeamZero.Core.Logging;
@@ -35,15 +40,15 @@ namespace TeamZero.InAppPurchases
         }
 
 #if PACKAGE_COM_NEUECC_UNIRX
-        private readonly UniRx.Subject<UniRx.Unit> _statusSubject = new ();
-        public IObservable<UniRx.Unit> StatusAsObservable() => _statusSubject;
+        private readonly Subject<Unit> _statusSubject = new();
+        public IObservable<Unit> StatusAsObservable() => _statusSubject;
 #endif
 
         public void ChangeStatus()
         {
             StatusChanged?.Invoke();
 #if PACKAGE_COM_NEUECC_UNIRX
-            _statusSubject.OnNext(UniRx.Unit.Default);
+            _statusSubject.OnNext(Unit.Default);
 #endif
         }
 
