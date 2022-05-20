@@ -15,16 +15,14 @@ namespace TeamZero.InAppPurchases
         private FakeConsumablePurchase(string price)
         {
             _price = price;
-            
-#pragma warning disable 4014
-            InitAsync();
-#pragma warning restore 4014
+            InitAsync().Forget();
         }
 
-        private async UniTask InitAsync()
+        private async UniTaskVoid InitAsync()
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(10), DelayType.Realtime);
+            await UniTask.Delay(TimeSpan.FromSeconds(5), DelayType.Realtime);
             _initialized = true;
+            ChangeStatus();
         }
         
         public string LocalizedPriceText() => _initialized ? _price : string.Empty;
