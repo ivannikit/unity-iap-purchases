@@ -11,7 +11,7 @@ namespace TeamZero.InAppPurchases.UnityIAP
 #if UNITY_EDITOR
             return new NotSupportedExtension(log);
 #elif UNITY_ANDROID
-            return new GooglePlayExtension(provider, log)
+            return new GooglePlayExtension(provider, log);
 #elif UNITY_IOS
             return new AppleExtension(provider, log);
 #else
