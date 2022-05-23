@@ -56,6 +56,6 @@ namespace TeamZero.InAppPurchases
 
         public bool IsConsumed() => _hub.IsConsumed(_id);
         
-        public bool IsAvailableToPurchase() => _hub.IsAvailableToPurchase(_id);
+        public bool IsAvailableToPurchase() => _hub.IsAvailableToPurchase(_id) && !IsConsumed();
     }
 }
