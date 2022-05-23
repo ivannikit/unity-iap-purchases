@@ -23,6 +23,7 @@ namespace TeamZero.InAppPurchases.UnityIAP
         private UniTaskCompletionSource? _initSource;
         public async UniTask InitAsync(IEnumerable<string>? consumableIds, IEnumerable<string>? nonConsumableIds, IEnumerable<string>? subscriptionIds)
         {
+            _log.Info("Start initialization of In-App Purchasing");
             var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
 
             foreach (string id in FilterMissing(consumableIds))
