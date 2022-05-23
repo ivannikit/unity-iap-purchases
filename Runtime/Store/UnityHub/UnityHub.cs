@@ -38,6 +38,10 @@ namespace TeamZero.InAppPurchases.UnityIAP
             _initSource = new UniTaskCompletionSource();
             UnityPurchasing.Initialize(this, builder);
             await _initSource.Task;
+            
+            //wait process purchases calls to after initialization complete (restoring products info)
+            await UniTask.Yield();
+            _log.Info("end of wait process purchases calls to after initialization complete");
         }
 
         private IEnumerable<string> FilterMissing(IEnumerable<string>? ids)
@@ -149,7 +153,8 @@ namespace TeamZero.InAppPurchases.UnityIAP
             }
             else
             {
-                _log.Error($"Purchase result not found - Product: {id}");
+                //This is place to add after initialization calls
+                _log.Info($"process purchases calls to after initialization complete id - {id}");
             }
         }
         
