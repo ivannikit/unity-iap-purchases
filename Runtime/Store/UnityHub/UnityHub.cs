@@ -110,7 +110,14 @@ namespace TeamZero.InAppPurchases.UnityIAP
                 _purchaseTaskCollection.Add(id, source);
                 _store.InitiatePurchase(id);
 
-                return await source.Task;
+                bool completed = await source.Task;
+                if (_log.InfoEnabled())
+                {
+                    string resultMessage = completed ? "Completed" : "Failed";
+                    _log.Info($"Purchase result: {resultMessage} Product: {id}");
+                }
+                
+                return completed;
             }
 
             return false;
@@ -137,12 +144,6 @@ namespace TeamZero.InAppPurchases.UnityIAP
         {
             if (_purchaseTaskCollection.TryGetValue(id, out UniTaskCompletionSource<bool> source))
             {
-                if (_log.InfoEnabled())
-                {
-                    string result = completed ? "Completed" : "Failed";
-                    _log.Info($"Purchase result: {result} Product: {id}");
-                }
-                
                 _purchaseTaskCollection.Remove(id);
                 source.TrySetResult(completed);
             }
