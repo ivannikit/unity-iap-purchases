@@ -2,7 +2,7 @@
 
 namespace TeamZero.InAppPurchases
 {
-    public interface ISubscription : IPurchase, IRestorable
+    public interface ISubscription : IStorePurchase, IRestorable
     {
     }
 }

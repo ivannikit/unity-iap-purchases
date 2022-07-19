@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TeamZero.InAppPurchases
 {
-    internal class RestoredLibrary<T> : Library<T> where T : IPurchase, IRestorable
+    internal class RestoredLibrary<T> : Library<T> where T : IStorePurchase, IRestorable
     {
         internal new static RestoredLibrary<T> Create(IPurchaseFactory<T> factory, IPurchaseHub hub, int capacity = 0)
         {

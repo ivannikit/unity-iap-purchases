@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace TeamZero.InAppPurchases
 {
-    internal class Library<T> where T : IPurchase
+    internal class Library<T> where T : IStorePurchase
     {
         protected readonly Dictionary<string, T> _items;
         private readonly IPurchaseFactory<T> _factory;

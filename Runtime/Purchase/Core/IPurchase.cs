@@ -15,8 +15,6 @@ namespace TeamZero.InAppPurchases
         IObservable<UniRx.Unit> StatusAsObservable();
 #endif
         
-        void ChangeStatus(); //TODO This method must be not available from API (internal)
-        
         string LocalizedPriceText();
         bool IsAvailableToPurchase();
         bool IsConsumed();

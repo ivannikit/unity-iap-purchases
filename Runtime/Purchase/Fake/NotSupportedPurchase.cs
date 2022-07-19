@@ -24,20 +24,15 @@ namespace TeamZero.InAppPurchases
         
 #pragma warning disable 1998
         public async UniTask<bool> ConsumeAsync() => false;
-        public event Action? StatusChanged;
 #pragma warning restore 1998
+        
+#pragma warning disable 0067
+        public event Action? StatusChanged;
+#pragma warning restore 0067
 
 #if PACKAGE_COM_NEUECC_UNIRX
         private readonly UniRx.Subject<UniRx.Unit> _statusSubject = new ();
         public IObservable<UniRx.Unit> StatusAsObservable() => _statusSubject;
 #endif
-
-        public void ChangeStatus()
-        {
-            StatusChanged?.Invoke();
-#if PACKAGE_COM_NEUECC_UNIRX
-            _statusSubject.OnNext(UniRx.Unit.Default);
-#endif
-        }
     }
 }

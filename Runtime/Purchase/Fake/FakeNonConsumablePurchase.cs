@@ -54,7 +54,7 @@ namespace TeamZero.InAppPurchases
         public IObservable<UniRx.Unit> StatusAsObservable() => _statusSubject;
 #endif
 
-        public void ChangeStatus()
+        private void ChangeStatus()
         {
             StatusChanged?.Invoke();
 #if PACKAGE_COM_NEUECC_UNIRX

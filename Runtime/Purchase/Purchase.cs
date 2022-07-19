@@ -10,7 +10,7 @@ using TeamZero.Core.Logging;
 
 namespace TeamZero.InAppPurchases
 {
-    public abstract class Purchase : IPurchase
+    public abstract class Purchase : IStorePurchase
     {
         private readonly string _id;
         private readonly IPurchaseHub _hub;
