@@ -2,7 +2,7 @@
 
 Hi level wrapper for Unity IAP package.
 
-```
+```csharp
 IPurchase fakePurchase = FakeNonConsumablePurchase.Create(price: "9.99 $", responseDelay: TimeSpan.FromSeconds(5d));
 ...
 

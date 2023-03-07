@@ -1,7 +1,7 @@
 {
   "name": "com.teamzero.iap-purchases",
   "displayName": "TeamZero IAP Purchases",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "unity": "2020.3",
   "description": "TeamZero IAP Purchases",
   "keywords": [
