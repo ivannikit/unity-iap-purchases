@@ -20,6 +20,8 @@ nonConsumablePurchase.RestoredAsObservable()
         bool isConsumed = nonConsumablePurchase.IsConsumed();
         ...
     });
+await store.RestoreAllAsync();
+...
 
 string price = nonConsumablePurchase.LocalizedPriceText();
 bool isConsumed = await nonConsumablePurchase.ConsumeAsync();
