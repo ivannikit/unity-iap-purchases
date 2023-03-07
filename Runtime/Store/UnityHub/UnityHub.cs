@@ -1,4 +1,5 @@
 #nullable enable
+
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using TeamZero.Core.Logging;
@@ -80,14 +81,17 @@ namespace TeamZero.InAppPurchases.UnityIAP
             _initSource?.TrySetResult();
             _initSource = null;
         }
-        
-        void IStoreListener.OnInitializeFailed(InitializationFailureReason error)
+
+        void IStoreListener.OnInitializeFailed(InitializationFailureReason error) =>
+            (this as IStoreListener).OnInitializeFailed(error, null);
+
+        void IStoreListener.OnInitializeFailed(InitializationFailureReason error, string? message)
         {
             _log.Error($"In-App Purchasing initialize failed: {error}");
             _initSource?.TrySetResult();
             _initSource = null;
         }
-
+        
         
         public async UniTask<bool> RestoreAllAsync()
         {

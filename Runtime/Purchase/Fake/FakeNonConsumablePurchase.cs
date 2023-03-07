@@ -6,15 +6,19 @@ namespace TeamZero.InAppPurchases
 {
     internal class FakeNonConsumablePurchase : IRestorablePurchase
     {
-        public static FakeNonConsumablePurchase Create(string price) => new(price);
+        public static FakeNonConsumablePurchase Create() => Create("Fake 9.99 $");
+        public static FakeNonConsumablePurchase Create(string price) => Create(price, TimeSpan.FromSeconds(5));
+        public static FakeNonConsumablePurchase Create(string price, TimeSpan responseDelay) => new(price, responseDelay);
         
         private readonly string _price;
+        private readonly TimeSpan _responseDelay;
         private bool _initialized = false;
         private bool _consumed = false;
         
-        private FakeNonConsumablePurchase(string price)
+        private FakeNonConsumablePurchase(string price, TimeSpan responseDelay)
         {
             _price = price;
+            _responseDelay = responseDelay;
             InitAsync().Forget();
         }
 

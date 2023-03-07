@@ -14,7 +14,10 @@ namespace TeamZero.InAppPurchases.UnityIAP
             _appleExtensions = provider.GetExtension<IAppleExtensions>();
         }
         
-        protected override void RestoreTransactions(Action<bool> result) =>
-            _appleExtensions.RestoreTransactions(result);
+        protected override void RestoreTransactions(Action<bool> result)
+        {
+            void Callback(bool success, string? error) => result.Invoke(success);
+            _appleExtensions.RestoreTransactions(Callback);
+        }
     }
 }
